@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TVS SCS CARBON TRACKER   </title>
+  <title>TVS SCS CARBON TRACKER</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -126,7 +126,6 @@
       return;
     }
 
-    // Base emission factor (in grams CO2 per ton-km)
     const emissionFactors = {
       bs4: 62,
       bs6: 48
@@ -148,10 +147,13 @@
       totalEmission = baseEmissionPerKm * distance;
     }
 
+    const convertedPerKm = baseEmissionPerKm * 0.2727;
+    const convertedTotal = totalEmission * 0.2727;
+
     document.getElementById('result').innerHTML = `
       <strong>Estimated Emissions:</strong><br>
-      Emission per km: <strong>${baseEmissionPerKm.toFixed(2)} kg CO₂</strong><br>
-      Total emission: <strong>${totalEmission.toFixed(2)} kg CO₂</strong>
+      Emission per km: <strong>${convertedPerKm.toFixed(2)} kg CO₂-eq</strong><br>
+      Total emission: <strong>${convertedTotal.toFixed(2)} kg CO₂-eq</strong>
     `;
   }
 </script>
