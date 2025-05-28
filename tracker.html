@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TVS SCS CARBON TRACKER   </title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #e6f2ff;
+      padding: 20px;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      border: 2px solid #0073e6;
+    }
+    h2 {
+      text-align: center;
+      color: #004080;
+    }
+    label {
+      font-weight: bold;
+      color: #003366;
+    }
+    select, input {
+      display: block;
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      background-color: #f0f8ff;
+    }
+    button {
+      padding: 12px;
+      background-color: #0073e6;
+      color: white;
+      font-weight: bold;
+      border: none;
+      width: 100%;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #005bb5;
+    }
+    .result {
+      margin-top: 20px;
+      background: #ccf2ff;
+      padding: 15px;
+      border-radius: 10px;
+      border-left: 5px solid #0073e6;
+      color: #003366;
+    }
+    #reuseSection {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h2>TVS SCS Carbon Emission Tracker</h2>
+
+  <label for="tripType">Trip Type:</label>
+  <select id="tripType" onchange="handleTripTypeChange()">
+    <option value="onway">One-way</option>
+    <option value="returnable">Returnable</option>
+  </select>
+
+  <div id="reuseSection">
+    <label for="reuseCount">Number of Times Reused:</label>
+    <input type="number" id="reuseCount" min="1" value="1">
+  </div>
+
+  <label for="truckType">Truck Type:</label>
+  <select id="truckType">
+    <option value="19">19 ft</option>
+    <option value="20">20 ft</option>
+    <option value="32">32 ft</option>
+  </select>
+
+  <label for="emissionStandard">Emission Standard:</label>
+  <select id="emissionStandard">
+    <option value="bs4">BS4</option>
+    <option value="bs6">BS6</option>
+  </select>
+
+  <label for="distance">Distance Travelled (km):</label>
+  <input type="number" id="distance" min="1" required>
+
+  <label for="load">Truck Load (in tons):</label>
+  <input type="number" id="load" min="1" required>
+
+  <button onclick="calculateEmission()">Calculate Emission</button>
+
+  <div class="result" id="result"></div>
+</div>
+
+<script>
+  function handleTripTypeChange() {
+    const tripType = document.getElementById('tripType').value;
+    const reuseSection = document.getElementById('reuseSection');
+    if (tripType === 'returnable') {
+      reuseSection.style.display = 'block';
+    } else {
+      reuseSection.style.display = 'none';
+    }
+  }
+
+  function calculateEmission() {
+    const truckType = document.getElementById('truckType').value;
+    const emissionStandard = document.getElementById('emissionStandard').value;
+    const distance = parseFloat(document.getElementById('distance').value);
+    const load = parseFloat(document.getElementById('load').value);
+    const tripType = document.getElementById('tripType').value;
+    const reuseCount = parseFloat(document.getElementById('reuseCount').value) || 1;
+
+    if (!distance || !load) {
+      alert('Please enter valid distance and load values.');
+      return;
+    }
+
+    // Base emission factor (in grams CO2 per ton-km)
+    const emissionFactors = {
+      bs4: 62,
+      bs6: 48
+    };
+
+    const truckFactor = {
+      '19': 1.0,
+      '20': 1.05,
+      '32': 1.2
+    };
+
+    const factor = emissionFactors[emissionStandard] * truckFactor[truckType];
+    const baseEmissionPerKm = (factor * load) / 1000; // kg CO2 per km
+    let totalEmission;
+
+    if (tripType === 'returnable') {
+      totalEmission = (baseEmissionPerKm * distance * 2) / reuseCount;
+    } else {
+      totalEmission = baseEmissionPerKm * distance;
+    }
+
+    document.getElementById('result').innerHTML = `
+      <strong>Estimated Emissions:</strong><br>
+      Emission per km: <strong>${baseEmissionPerKm.toFixed(2)} kg CO₂</strong><br>
+      Total emission: <strong>${totalEmission.toFixed(2)} kg CO₂</strong>
+    `;
+  }
+</script>
+</body>
+</html>
